@@ -1,10 +1,13 @@
+import { ModuleOptions } from "../../module"
+import { RouteContext, WebVitalsMetric } from "../types"
+
 const eventListeners = []
 // @ts-ignore
 window.onVitalEvent = (listener) => {
   eventListeners.push(listener)
 }
 
-export function sendToAnalytics (context, metric, options: any) {
+export const sendToAnalytics = (context: RouteContext, metric: WebVitalsMetric, options: ModuleOptions) => {
   const event = {
     date: new Date(),
     context,
@@ -16,7 +19,7 @@ export function sendToAnalytics (context, metric, options: any) {
   })
 
   // eslint-disable-next-line no-console
-  console.log('[nuxt vitals]', metric.name, metric.value, context, {
+  console.log('`[@nuxtjs/web-vitals]`', metric.name, metric.value, context, {
     context,
     metric,
     options

@@ -1,15 +1,15 @@
-import { logDebug, getConnectionSpeed, send } from '../utils'
+import { RouteContext, WebVitalsMetric } from "../types"
+import { send } from "../utils"
+import { ModuleOptions } from '../../module'
 
-export interface Options {
-  dsn: string
-  debug: boolean
+const getConnectionSpeed = (): string => {
+  // @ts-ignore
+  return (typeof navigator !== 'undefined' && navigator.connection && navigator.connection.effectiveType) || ''
 }
 
-const vitalsUrl = 'https://vitals.vercel-analytics.com/v1/vitals'
-
-export function sendToAnalytics ({ fullPath, href }, metric, options: Options) {
+export const sendToAnalytics = ({ fullPath, href }: RouteContext, metric: WebVitalsMetric, options: ModuleOptions) => {
   const body = {
-    dsn: options.dsn,
+    dsn: options.options.vercelAnalyticsDsn,
     id: metric.id,
     page: fullPath,
     href,
@@ -19,7 +19,7 @@ export function sendToAnalytics ({ fullPath, href }, metric, options: Options) {
   }
 
   if (options.debug) {
-    logDebug(metric.name, JSON.stringify(body, null, 2))
+    console.log(metric.name, JSON.stringify(body, null, 2))
   }
 
   // This content type is necessary for `sendBeacon`
@@ -27,5 +27,5 @@ export function sendToAnalytics ({ fullPath, href }, metric, options: Options) {
     type: 'application/x-www-form-urlencoded'
   })
 
-  send(vitalsUrl, blob)
+  send('https://vitals.vercel-analytics.com/v1/vitals', blob)
 }
